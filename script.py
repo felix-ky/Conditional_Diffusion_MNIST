@@ -24,7 +24,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision import models, transforms
-from torchvision.datasets import MNIST
+from torchvision.datasets import MNIST, CIFAR10
 from torchvision.utils import save_image, make_grid
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
@@ -310,13 +310,13 @@ def train_mnist():
     n_T = 400 # 500
     device = "cuda:0"
     n_classes = 10
-    n_feat = 128 # 128 ok, 256 better (but slower)
+    n_feat = 256 # 128 ok, 256 better (but slower)
     lrate = 1e-4
     save_model = False
     save_dir = './data/diffusion_outputs10/'
     ws_test = [0.0, 0.5, 2.0] # strength of generative guidance
 
-    ddpm = DDPM(nn_model=ContextUnet(in_channels=1, n_feat=n_feat, n_classes=n_classes), betas=(1e-4, 0.02), n_T=n_T, device=device, drop_prob=0.1)
+    ddpm = DDPM(nn_model=ContextUnet(in_channels=3, n_feat=n_feat, n_classes=n_classes), betas=(1e-4, 0.02), n_T=n_T, device=device, drop_prob=0.1) # channel 1 --> 3 
     ddpm.to(device)
 
     # optionally load a model
@@ -324,7 +324,7 @@ def train_mnist():
 
     tf = transforms.Compose([transforms.ToTensor()]) # mnist is already normalised 0 to 1
 
-    dataset = MNIST("./data", train=True, download=True, transform=tf)
+    dataset = CIFAR10("./data", train=True, download=True, transform=tf)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=5)
     optim = torch.optim.Adam(ddpm.parameters(), lr=lrate)
 
@@ -356,7 +356,7 @@ def train_mnist():
         with torch.no_grad():
             n_sample = 4*n_classes
             for w_i, w in enumerate(ws_test):
-                x_gen, x_gen_store = ddpm.sample(n_sample, (1, 28, 28), device, guide_w=w)
+                x_gen, x_gen_store = ddpm.sample(n_sample, (3, 32, 32), device, guide_w=w) # channel 1 --> 3 
 
                 # append some real images at bottom, order by class also
                 x_real = torch.Tensor(x_gen.shape).to(device)
