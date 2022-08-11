@@ -140,7 +140,7 @@ class ContextUnet(nn.Module):
 
         self.up0 = nn.Sequential(
             # nn.ConvTranspose2d(6 * n_feat, 2 * n_feat, 7, 7), # when concat temb and cemb end up w 6*n_feat
-            nn.ConvTranspose2d(2 * n_feat, 2 * n_feat, 7, 7), # otherwise just have 2*n_feat # output_size = 7 * input_size
+            nn.ConvTranspose2d(2 * n_feat, 2 * n_feat, 8, 8), # otherwise just have 2*n_feat # output_size = 7 * input_size
             nn.GroupNorm(8, 2 * n_feat),
             nn.ReLU(),
         )
@@ -324,7 +324,7 @@ def train_mnist():
 
     tf = transforms.Compose([transforms.ToTensor()]) # mnist is already normalised 0 to 1
 
-    dataset = CIFAR10("./data", train=True, download=True, transform=tf)
+    dataset = CIFAR10("/home/xky/", train=True, download=False, transform=tf)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=5)
     optim = torch.optim.Adam(ddpm.parameters(), lr=lrate)
 
