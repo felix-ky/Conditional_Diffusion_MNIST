@@ -14,7 +14,7 @@ This technique also features in ImageGen 'Photorealistic Text-to-Image Diffusion
 https://arxiv.org/abs/2205.11487
 
 '''
-1111
+
 import os
 os.environ['CUDA_VISIBLE_DEVICES']="1"
 from typing import Dict, Tuple
