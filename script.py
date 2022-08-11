@@ -14,7 +14,9 @@ This technique also features in ImageGen 'Photorealistic Text-to-Image Diffusion
 https://arxiv.org/abs/2205.11487
 
 '''
-
+1111
+import os
+os.environ['CUDA_VISIBLE_DEVICES']="1"
 from typing import Dict, Tuple
 from tqdm import tqdm
 import torch
@@ -85,7 +87,7 @@ class UnetUp(nn.Module):
         process and upscale the image feature maps
         '''
         layers = [
-            nn.ConvTranspose2d(in_channels, out_channels, 2, 2),
+            nn.ConvTranspose2d(in_channels, out_channels, 2, 2), # output_size = 2 * input_size
             ResidualConvBlock(out_channels, out_channels),
             ResidualConvBlock(out_channels, out_channels),
         ]
@@ -138,7 +140,7 @@ class ContextUnet(nn.Module):
 
         self.up0 = nn.Sequential(
             # nn.ConvTranspose2d(6 * n_feat, 2 * n_feat, 7, 7), # when concat temb and cemb end up w 6*n_feat
-            nn.ConvTranspose2d(2 * n_feat, 2 * n_feat, 7, 7), # otherwise just have 2*n_feat
+            nn.ConvTranspose2d(2 * n_feat, 2 * n_feat, 7, 7), # otherwise just have 2*n_feat # output_size = 7 * input_size
             nn.GroupNorm(8, 2 * n_feat),
             nn.ReLU(),
         )
@@ -159,7 +161,7 @@ class ContextUnet(nn.Module):
         x = self.init_conv(x)
         down1 = self.down1(x)
         down2 = self.down2(down1)
-        hiddenvec = self.to_vec(down2)
+        hiddenvec = self.to_vec(down2) # (1, 1, 512)
 
         # convert context to one hot embedding
         c = nn.functional.one_hot(c, num_classes=self.n_classes).type(torch.float)
