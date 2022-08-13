@@ -308,9 +308,9 @@ class DDPM(nn.Module):
 def train_mnist():
 
     # hardcoding these here
-    n_epoch =  50
+    n_epoch =  50 #20
     batch_size = 256
-    n_T = 400 # 500
+    n_T = 600 # 500
     device = "cuda:0"
     n_classes = 10
     n_feat = 256 # 128 ok, 256 better (but slower)
@@ -360,7 +360,7 @@ def train_mnist():
             n_sample = 4*n_classes
             for w_i, w in enumerate(ws_test):
                 x_gen, x_gen_store = ddpm.sample(n_sample, (3, 32, 32), device, guide_w=w) # channel 1 --> 3 
-                x_gen = torch.clamp((x_gen + 1.0)/2.0, 0.0, 1.0)
+                x_gen = torch.clamp((x_gen-x_gen.min()/(x_gen.max()-x_gen.min())), 0.0, 1.0)
                 x_gen = x_gen.contiguous()
                 # append some real images at bottom, order by class also
                 x_real = torch.Tensor(x_gen.shape).to(device)
